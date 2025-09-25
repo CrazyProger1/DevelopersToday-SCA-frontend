@@ -3,6 +3,7 @@ import "./globals.css";
 import React from "react";
 import { Poppins } from "next/font/google";
 import { ModalProvider } from "@/components/modals";
+import { ToastProvider } from "@/components/toasts";
 
 export const metadata: Metadata = {
   title: "Spy Cats Agency!",
@@ -23,7 +24,9 @@ const RootLayout = ({ children }: Readonly<Props>) => {
   return (
     <html lang="en" className={`${poppins.className}`}>
       <body>
-        <ModalProvider>{children}</ModalProvider>
+        <ModalProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ModalProvider>
       </body>
     </html>
   );

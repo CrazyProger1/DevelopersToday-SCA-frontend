@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Cat } from "@/types";
+import { createCatAction } from "@/actions";
+import { notify } from "@/helpers";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -42,11 +45,13 @@ export const AddCatForm = () => {
       salary: 0,
     },
   });
+  const router = useRouter();
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const cat: Cat = values;
-    console.log(cat);
-  }
+  const onSubmit = async (cat: Cat) => {
+    const response = await createCatAction(cat);
+    notify("Agent added!", "success");
+    router.push("/dashboard");
+  };
 
   return (
     <Form {...form}>
@@ -77,7 +82,10 @@ export const AddCatForm = () => {
                   type="number"
                   placeholder="3"
                   {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    return field.onChange(value ? Number(value) : "");
+                  }}
                 />
               </FormControl>
               <FormDescription>Years of spy experience.</FormDescription>
@@ -112,7 +120,10 @@ export const AddCatForm = () => {
                   type="number"
                   placeholder="5000"
                   {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    return field.onChange(value ? Number(value) : "");
+                  }}
                 />
               </FormControl>
               <FormDescription>Monthly salary ($).</FormDescription>

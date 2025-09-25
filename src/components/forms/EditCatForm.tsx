@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Cat } from "@/types";
 
 const formSchema = z.object({
   salary: z.number().gte(0, {
@@ -22,15 +23,20 @@ const formSchema = z.object({
   }),
 });
 
-export const EditCatForm = () => {
+type Props = {
+  page: string;
+  cat: Cat;
+};
+
+export const EditCatForm = ({ page, cat }: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      salary: 0,
+      salary: cat.salary,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {}
+  const onSubmit = (values: z.infer<typeof formSchema>) => {};
 
   return (
     <Form {...form}>
