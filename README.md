@@ -37,6 +37,10 @@ npm run dev
 </p>
 
 <p align="center">
+<img src="docs/validation.png" alt="validation">
+</p>
+
+<p align="center">
 <img src="docs/edit.png" alt="editing">
 </p>
 
