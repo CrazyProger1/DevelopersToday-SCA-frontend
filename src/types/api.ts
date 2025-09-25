@@ -7,6 +7,8 @@ export type SuccessfulResponse = {
 } & Response;
 
 export type ErrorResponse = {
+  type?: string;
+  errors?: { code: string; detail: string; attr: string }[];
   success: false;
 } & Response;
 
@@ -20,4 +22,8 @@ export type PaginatedResponse<T> = {
 export type PaginationParams = {
   offset?: string;
   limit?: string;
+};
+
+export type HasId = {
+  id: number;
 };

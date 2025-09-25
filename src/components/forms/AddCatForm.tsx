@@ -15,9 +15,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Cat } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Breed } from "@/types";
 import { createCatAction } from "@/actions";
-import { notify } from "@/helpers";
+import { handleValidationAPIError, notify } from "@/helpers";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
@@ -27,30 +34,47 @@ const formSchema = z.object({
   experience: z.number().gte(0, {
     message: "Cat's experience can't be negative.",
   }),
-  breed: z.string().min(2, {
-    message: "Cat's breed must be at least 2 characters.",
+  breed: z.number().int().positive({
+    message: "Please select a valid breed.",
   }),
-  salary: z.number().gte(0, {
-    message: "Cat's salary can't be negative!!!!",
+  salary: z.number().gte(1, {
+    message: "Cat's salary should be at least 1$!!!!😾",
   }),
 });
 
-export const AddCatForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
+type FormValues = z.infer<typeof formSchema>;
+
+type Props = {
+  page: string;
+  breeds: Breed[];
+};
+
+export const AddCatForm = ({ page, breeds }: Props) => {
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       experience: 0,
-      breed: "",
+      breed: 1,
       salary: 0,
     },
   });
   const router = useRouter();
 
-  const onSubmit = async (cat: Cat) => {
-    const response = await createCatAction(cat);
-    notify("Agent added!", "success");
-    router.push("/dashboard");
+  const onSubmit = async (data: FormValues) => {
+    const response = await createCatAction(data);
+    if (response.success) {
+      notify("Agent saved!", "success");
+      router.push(page, { scroll: false });
+      return;
+    } else {
+      const handled = handleValidationAPIError(form, response);
+
+      if (!handled) {
+        notify("Failed to update agent! Please try again later.", "error");
+        router.push(page, { scroll: false });
+      }
+    }
   };
 
   return (
@@ -101,7 +125,21 @@ export const AddCatForm = () => {
             <FormItem>
               <FormLabel>Breed</FormLabel>
               <FormControl>
-                <Input placeholder="Siamese" {...field} />
+                <Select
+                  onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                  value={field.value?.toString()}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a breed" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {breeds.map((breed) => (
+                      <SelectItem key={breed.id} value={breed.id.toString()}>
+                        {breed.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormDescription>Cat&#39;s breed.</FormDescription>
               <FormMessage />
@@ -132,7 +170,7 @@ export const AddCatForm = () => {
           )}
         />
         <div className="flex flex-col items-center">
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Add</Button>
         </div>
       </form>
     </Form>

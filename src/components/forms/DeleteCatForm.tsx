@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { deleteCatAction } from "@/actions";
 import { notify } from "@/helpers";
 import { useRouter } from "next/navigation";
-import { Cat } from "@/types";
+import { Cat, HasId } from "@/types";
 
 type Props = {
   page: string;
-  cat: Cat;
+  cat: Cat & HasId;
 };
 
 export const DeleteCatForm = ({ page, cat }: Props) => {

@@ -16,27 +16,48 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Cat } from "@/types";
+import { updateCatAction } from "@/actions";
+import { handleValidationAPIError, notify } from "@/helpers";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  salary: z.number().gte(0, {
-    message: "Cat's salary can't be negative!!!!",
+  salary: z.number().gte(1, {
+    message: "Cat's salary should be at least 1$!!!!😾",
   }),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 type Props = {
   page: string;
-  cat: Cat;
+  cat: Cat & { id: number };
 };
 
 export const EditCatForm = ({ page, cat }: Props) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      salary: cat.salary,
+      salary: Number(cat.salary),
     },
   });
+  const router = useRouter();
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {};
+  const onSubmit = async (data: FormValues) => {
+    const response = await updateCatAction(cat.id, { ...cat, salary: data.salary });
+
+    if (response.success) {
+      notify("Agent saved!", "success");
+      router.push(page, { scroll: false });
+      return;
+    } else {
+      const handled = handleValidationAPIError(form, response);
+
+      if (!handled) {
+        notify("Failed to update agent! Please try again later.", "error");
+        router.push(page, { scroll: false });
+      }
+    }
+  };
 
   return (
     <Form {...form}>
@@ -52,7 +73,10 @@ export const EditCatForm = ({ page, cat }: Props) => {
                   type="number"
                   placeholder="5000"
                   {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    return field.onChange(value ? Number(value) : "");
+                  }}
                 />
               </FormControl>
               <FormDescription>Monthly salary ($).</FormDescription>
@@ -61,7 +85,7 @@ export const EditCatForm = ({ page, cat }: Props) => {
           )}
         />
         <div className="flex flex-col items-center">
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Save</Button>
         </div>
       </form>
     </Form>

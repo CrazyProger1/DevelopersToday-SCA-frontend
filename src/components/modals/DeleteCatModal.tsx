@@ -23,7 +23,7 @@ export const DeleteCatModal = async ({ page, visible, catId }: Props) => {
   }
 
   return (
-    <BaseModal query="delete" exitButtonHref={page} className="bg-background w-1/2 rounded-2xl p-4">
+    <BaseModal query="delete" exitButtonHref={page} className="bg-background w-1/2 rounded-2xl p-8">
       <div className="flex flex-col items-center space-y-8">
         <div className="text-center text-xl font-bold">Delete Agent</div>
         <div>Are you sure you want to delete an agent?</div>

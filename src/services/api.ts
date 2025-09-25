@@ -20,7 +20,7 @@ export const fetchExtended = async (path: string, options: RequestInit = {}): Pr
 
   return await fetch(`${API_URL}${path}`, {
     next: {
-      revalidate: 0,
+      revalidate: 60,
     },
     ...options,
     headers: requestHeaders,

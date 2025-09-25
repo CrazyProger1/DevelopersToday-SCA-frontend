@@ -8,17 +8,18 @@ import {
   ErrorResponse,
   PaginatedResponse,
   SuccessfulResponse,
+  HasId,
 } from "@/types";
 
-type CatsResponse = PaginatedResponse<Cat> | ErrorResponse;
-type CatResponse = (SuccessfulResponse & Cat) | ErrorResponse;
+type CatsResponse = PaginatedResponse<Cat & HasId> | ErrorResponse;
+type CatResponse = (SuccessfulResponse & Cat & HasId) | ErrorResponse;
 
 export const getCats = async (params?: PaginationParams): Promise<CatsResponse> => {
   const searchParams = new URLSearchParams(params);
   const url = `${API_ENDPOINTS.getCats}?${searchParams.toString()}`;
 
   try {
-    const response = await fetchExtended(url);
+    const response = await fetchExtended(url, { next: { tags: ["cats"], revalidate: 60 } });
     const data = await response.json();
 
     return {
@@ -38,7 +39,7 @@ export const getCat = async (id: number): Promise<CatResponse> => {
   const url = API_ENDPOINTS.getCat.replace(":id", String(id));
 
   try {
-    const response = await fetchExtended(url);
+    const response = await fetchExtended(url, { next: { tags: ["cats"], revalidate: 60 } });
     const data = await response.json();
 
     return {
@@ -102,7 +103,7 @@ export const updateCat = async (id: number, cat: Cat): Promise<CatResponse> => {
     const data = await response.json();
 
     return {
-      success: response.status === 201,
+      success: response.status === 200,
       ...data,
     };
   } catch (error) {

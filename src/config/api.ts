@@ -5,4 +5,5 @@ export const API_ENDPOINTS = {
   createCat: "api/v1/cats/",
   updateCat: "api/v1/cats/:id/",
   deleteCat: "api/v1/cats/:id/",
+  getBreeds: "api/v1/breeds",
 };

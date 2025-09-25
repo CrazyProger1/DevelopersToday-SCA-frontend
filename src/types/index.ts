@@ -5,5 +5,7 @@ export {
   type ErrorResponse,
   type PaginatedResponse,
   type PaginationParams,
+  type HasId,
 } from "./api";
 export { type ModalParams } from "./modals";
+export { type Breed } from "./breeds";
